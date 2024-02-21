@@ -5,6 +5,7 @@ solution called test.sln
 2 project sub-folders
 
 /test - (named originally for the Santander 'test') - but better renamed to 'TopHackerNewStories' (as is the actual Project name)
+
 /TopHackerNewStoriesTest
 
 build and run/debug the TopHackerNewStories in VS2022
