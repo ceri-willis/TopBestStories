@@ -1,10 +1,8 @@
 @test_HostAddress = http://localhost:5041
 
-GET {{test_HostAddress}}/weatherforecast/
-Accept: application/json
 
 ###
-GET {{test_HostAddress}}/TopHackerNewsStories/15
+GET {{test_HostAddress}}/TopHackerNewsStories?numStories=15
 
 
 Accept: application/json
