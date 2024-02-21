@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
+using System.Security.Cryptography;
 using TopHackerNewsStories.Helpers;
 using TopHackerNewsStories.Model;
 using TopHackerNewsStories.Services;
@@ -20,36 +21,53 @@ namespace TopHackerNewsStories.Tests
         public void Setup()
         {
             _mockGetStoryDetailService = new Mock<IGetStoryDetailService>();
-            _mockLogger = new Mock<ILogger<IGetCachedStoryDetailService>>();           
+            _mockLogger = new Mock<ILogger<IGetCachedStoryDetailService>>();
             _mockGetStoryDetailService.Setup(s => s.GetStoryDetailAsync(It.IsAny<int>())).ReturnsAsync((int id) => CreateStoryDetail(id).AsStatusOk());
         }
 
         [Test]
         public async Task ServiceCallsGetStoryDetailServiceOnlyIfStoryNotAlreadyRequested()
         {
-            var storyId = 1;
+
             var service = new GetCachedStoryDetailService(_mockGetStoryDetailService.Object, _mockLogger.Object);
 
-            var storyDetailStatus = await service.GetStoryDetailAsync(storyId);
+            var storyDetailStatus = await service.GetStoryDetailAsync(1);
 
-            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == storyId)), Times.Once);
+            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 1)), Times.Once);
             Assert.That(storyDetailStatus.Ok, Is.True);
             Assert.That(storyDetailStatus.Item, Is.Not.Null);
-            Assert.That(storyDetailStatus.Item.title, Is.EqualTo(storyId.ToString()));
+            Assert.That(storyDetailStatus.Item.title, Is.EqualTo(1.ToString()));
 
-            var storyDetailStatus2 = await service.GetStoryDetailAsync(storyId);
+            var storyDetailStatus2 = await service.GetStoryDetailAsync(2);
 
-            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == storyId)), Times.Once);// still only once
+            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 2)), Times.Once);
             Assert.That(storyDetailStatus2.Ok, Is.True);
             Assert.That(storyDetailStatus2.Item, Is.Not.Null);
-            Assert.That(storyDetailStatus2.Item.title, Is.EqualTo(storyId.ToString()));
+            Assert.That(storyDetailStatus2.Item.title, Is.EqualTo(2.ToString()));
 
-            var storyDetailStatus3 = await service.GetStoryDetailAsync(storyId);
+            var storyDetailStatus3 = await service.GetStoryDetailAsync(3);
 
-            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == storyId)), Times.Once);// still only once
+            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 3)), Times.Once);
             Assert.That(storyDetailStatus3.Ok, Is.True);
             Assert.That(storyDetailStatus3.Item, Is.Not.Null);
-            Assert.That(storyDetailStatus3.Item.title, Is.EqualTo(storyId.ToString()));
+            Assert.That(storyDetailStatus3.Item.title, Is.EqualTo(3.ToString()));
+
+
+            storyDetailStatus = await service.GetStoryDetailAsync(1);
+            storyDetailStatus2 = await service.GetStoryDetailAsync(2);
+            storyDetailStatus3 = await service.GetStoryDetailAsync(3);
+
+
+            storyDetailStatus = await service.GetStoryDetailAsync(1);
+            storyDetailStatus2 = await service.GetStoryDetailAsync(2);
+            storyDetailStatus3 = await service.GetStoryDetailAsync(3);
+
+            // still has only called api once per story
+            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 1)), Times.Once);
+            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 2)), Times.Once);
+            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 3)), Times.Once);
+
+
         }
 
         [Test]
@@ -130,10 +148,10 @@ namespace TopHackerNewsStories.Tests
 
 
             var storyDetailStatus3 = await service.GetStoryDetailAsync(3);
-            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 3)), Times.Once);         
+            _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 3)), Times.Once);
 
-            await service.GetStoryDetailAsync(1);          
-            await service.GetStoryDetailAsync(2);    
+            await service.GetStoryDetailAsync(1);
+            await service.GetStoryDetailAsync(2);
             await service.GetStoryDetailAsync(3);
 
             //Assert all  1,2,3 in cache
@@ -152,7 +170,7 @@ namespace TopHackerNewsStories.Tests
             _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 1)), Times.Exactly(2));
             _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 2)), Times.Once);
             _mockGetStoryDetailService.Verify(m => m.GetStoryDetailAsync(It.Is<int>(id => id == 3)), Times.Exactly(2));
-            
+
 
 
         }
