@@ -30,5 +30,5 @@ Implements a caching component for story details - cache stategy at the moment -
 threshold of cached items count is met -  being bigger than current best stories list by 1/2 - so   1/3 of cache is definitely for stories no longer in best stories list
 - just remove those stale items - requires miminal processing overhead to keep the cache size bounded - only check for potential cache purge with simple count comparison per request
   
-- Future  = Can change cache logic to remove  (still valid) storyIds after certain epxiry time so that  these  can get re-fetched to show updates to the score
+- Future  = Can change cache logic to remove  (still valid) storyIds after certain expiry time so that  these  can get re-fetched to show updates to the score
 
